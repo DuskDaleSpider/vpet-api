@@ -19,7 +19,7 @@ public class UserRoutes {
 	
 	@Bean
 	public RouterFunction<ServerResponse> routes(UserHandler handler) {
-		return RouterFunctions.route().path("/user",
+		return RouterFunctions.route().path("/users",
 				builder -> builder.POST(RequestPredicates.accept(MediaType.APPLICATION_JSON), handler::createUser))
 				.build();
 	}

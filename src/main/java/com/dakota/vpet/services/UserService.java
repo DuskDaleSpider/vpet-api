@@ -33,6 +33,7 @@ public class UserService {
                 if(!exists.booleanValue()) {
                     
                     user.setPassword(passEncoder.encode(user.getPassword()));
+                    user.setRole(User.Role.PLAYER); // Set new players to base role by default
 
                     return userRepo.insert(user);
                 }else {
