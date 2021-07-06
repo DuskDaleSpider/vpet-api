@@ -1,5 +1,6 @@
 package com.dakota.vpet.routes;
 
+import com.dakota.vpet.exceptions.TestException;
 import com.dakota.vpet.exceptions.UserAlreadyExistsException;
 import com.dakota.vpet.handlers.UserHandler;
 
@@ -16,25 +17,33 @@ import org.springframework.web.server.WebFilter;
 
 @Configuration
 public class UserRoutes {
-	
+
 	@Bean
 	public RouterFunction<ServerResponse> routes(UserHandler handler) {
-		return RouterFunctions.route().path("/users",
-				builder -> builder.POST(RequestPredicates.accept(MediaType.APPLICATION_JSON), handler::createUser))
-				.build();
+		return RouterFunctions.route().path("/users", builder -> {
+			builder.POST(RequestPredicates.accept(MediaType.APPLICATION_JSON), handler::createUser);
+		}).path("/login", builder -> {
+			builder.POST(RequestPredicates.accept(MediaType.APPLICATION_JSON), handler::loginUser);
+		}).path("/test", builder -> {
+			builder.POST(RequestPredicates.accept(MediaType.APPLICATION_JSON), handler::test);
+		}).build();
 	}
 
 	/*
-	 *  Basically cataches any flux/mono.error() and 
-	 *  handles it gracefully
+	 * Basically cataches any flux/mono.error() and handles it gracefully
 	 */
 	@Bean
-	public WebFilter exceptionsToErrorCode(){
-			return (exchange, next) -> next.filter(exchange)
-							.onErrorResume(UserAlreadyExistsException.class, e -> {
-								ServerHttpResponse res = exchange.getResponse();
-								res.setStatusCode(HttpStatus.CONFLICT);
-								return res.setComplete();
-							});
+	public WebFilter exceptionsToErrorCode() {
+		return (exchange, next) -> next.filter(exchange).onErrorResume(ex -> {
+			ServerHttpResponse res = exchange.getResponse();
+			
+			if(ex instanceof UserAlreadyExistsException){
+				res.setStatusCode(HttpStatus.CONFLICT);
+			}else if(ex instanceof TestException){
+				res.setStatusCode(HttpStatus.I_AM_A_TEAPOT);
+			}
+
+			return res.setComplete();
+		});
 	}
 }

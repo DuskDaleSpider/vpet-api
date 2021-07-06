@@ -1,5 +1,6 @@
 package com.dakota.vpet.services;
 
+import com.dakota.vpet.exceptions.TestException;
 import com.dakota.vpet.exceptions.UserAlreadyExistsException;
 import com.dakota.vpet.models.User;
 import com.dakota.vpet.repositories.UserRepository;
@@ -42,4 +43,18 @@ public class UserService {
             });
     }
     
+    public Mono<User> getUserByUsername(String username){
+        return userRepo.findByUsername(username);
+    }
+
+    public boolean isCorrectPassword(User user, String password){
+        return passEncoder.matches(password, user.getPassword());
+    }
+
+	public Mono<User> test(Mono<User> userMono) {
+		return userMono.flatMap(user -> {
+            return user.getUsername() == "Dakota" ? Mono.just(user) : Mono.error(new TestException());
+        });
+	}
+
 }
