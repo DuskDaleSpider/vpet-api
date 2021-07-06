@@ -32,9 +32,7 @@ public class UserService {
         return userRepo.existsByUsername(user.getUsername())
             .flatMap(exists -> {
                 if(!exists.booleanValue()) {
-                    
                     user.setPassword(passEncoder.encode(user.getPassword()));
-                    user.setRole(User.Role.PLAYER); // Set new players to base role by default
 
                     return userRepo.insert(user);
                 }else {
@@ -53,7 +51,8 @@ public class UserService {
 
 	public Mono<User> test(Mono<User> userMono) {
 		return userMono.flatMap(user -> {
-            return user.getUsername() == "Dakota" ? Mono.just(user) : Mono.error(new TestException());
+            System.err.println(user.getUsername());
+            return user.getUsername().equals("Dakota") ? Mono.just(user) : Mono.error(new TestException());
         });
 	}
 

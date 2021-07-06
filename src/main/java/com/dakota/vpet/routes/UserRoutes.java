@@ -26,6 +26,8 @@ public class UserRoutes {
 			builder.POST(RequestPredicates.accept(MediaType.APPLICATION_JSON), handler::loginUser);
 		}).path("/test", builder -> {
 			builder.POST(RequestPredicates.accept(MediaType.APPLICATION_JSON), handler::test);
+		}).path("/adminTest", builder -> {
+			builder.POST(RequestPredicates.accept(MediaType.APPLICATION_JSON), handler::adminTest);
 		}).build();
 	}
 

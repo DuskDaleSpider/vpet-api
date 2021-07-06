@@ -5,6 +5,7 @@ import java.util.concurrent.ExecutionException;
 import com.dakota.vpet.annotations.LoggedIn;
 import com.dakota.vpet.exceptions.UserAlreadyExistsException;
 import com.dakota.vpet.models.User;
+import com.dakota.vpet.models.User.Role;
 import com.dakota.vpet.services.UserService;
 import com.dakota.vpet.utils.JWTUtil;
 
@@ -28,7 +29,6 @@ public class UserHandler {
     }
 
     // POST /users
-    @LoggedIn
     public Mono<ServerResponse> createUser(ServerRequest req) {
         Mono<User> userMono = req.bodyToMono(User.class);
 
@@ -88,9 +88,16 @@ public class UserHandler {
         });
     }
 
+    @LoggedIn
     public Mono<ServerResponse> test(ServerRequest req) {
         Mono<User> userMono = req.bodyToMono(User.class);
         Mono<User> test = userService.test(userMono);
         return ServerResponse.ok().body(test, User.class);
+    }
+
+    @LoggedIn(minRole = Role.ADMIN)
+    public Mono<ServerResponse> adminTest(ServerRequest req){
+        User user = (User)req.attribute("user").get();
+        return ServerResponse.ok().bodyValue(user);
     }
 }
