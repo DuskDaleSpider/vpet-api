@@ -2,13 +2,16 @@ package com.dakota.vpet.services;
 
 import com.dakota.vpet.exceptions.TestException;
 import com.dakota.vpet.exceptions.UserAlreadyExistsException;
+import com.dakota.vpet.models.ActivePet;
 import com.dakota.vpet.models.User;
+import com.dakota.vpet.repositories.ActivePetRepository;
 import com.dakota.vpet.repositories.UserRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Service
@@ -16,10 +19,16 @@ public class UserService {
 
     private UserRepository userRepo;
     private PasswordEncoder passEncoder;
+    private ActivePetRepository activePetRepo;
 
     @Autowired
     public void setUserRepository(UserRepository repo) {
         this.userRepo = repo;
+    }
+
+    @Autowired
+    public void setPetRepository(ActivePetRepository repo){
+        this.activePetRepo = repo;
     }
 
     @Autowired
@@ -55,5 +64,13 @@ public class UserService {
             return user.getUsername().equals("Dakota") ? Mono.just(user) : Mono.error(new TestException());
         });
 	}
+
+    public Flux<ActivePet> getUserPets(String username) {
+        return activePetRepo.findAllByOwner(username);
+    }
+
+    public Mono<ActivePet> addUserPet(ActivePet testPet) {
+        return activePetRepo.insert(testPet);
+    }
 
 }

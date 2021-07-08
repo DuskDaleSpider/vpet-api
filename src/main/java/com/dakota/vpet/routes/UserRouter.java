@@ -22,7 +22,7 @@ public class UserRouter {
 	public RouterFunction<ServerResponse> userRoutes(UserHandler handler) {
 		return RouterFunctions.route().path("/users", builder -> {
 			builder.POST(RequestPredicates.accept(MediaType.APPLICATION_JSON), handler::createUser);
-			builder.path("/{id}", userIdBuilder -> {
+			builder.path("/{username}", userIdBuilder -> {
 				userIdBuilder.path("/pets", userPetsBuilder -> {
 					userPetsBuilder.GET(handler::getUserPets);
 				});

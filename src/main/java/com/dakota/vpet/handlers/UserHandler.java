@@ -4,6 +4,8 @@ import java.util.concurrent.ExecutionException;
 
 import com.dakota.vpet.annotations.LoggedIn;
 import com.dakota.vpet.exceptions.UserAlreadyExistsException;
+import com.dakota.vpet.models.ActivePet;
+import com.dakota.vpet.models.Pet;
 import com.dakota.vpet.models.User;
 import com.dakota.vpet.models.User.Role;
 import com.dakota.vpet.services.UserService;
@@ -17,6 +19,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Component
@@ -90,15 +93,22 @@ public class UserHandler {
 
     @LoggedIn
     public Mono<ServerResponse> getUserPets(ServerRequest req){
-        String userId = req.pathVariable("id");
-        return ServerResponse.ok().bodyValue(userId);
+        String username = req.pathVariable("username");
+        Flux<ActivePet> userPets = userService.getUserPets(username);
+        return ServerResponse.ok().body(userPets, Pet.class);  
     }
 
     @LoggedIn
     public Mono<ServerResponse> test(ServerRequest req) {
-        Mono<User> userMono = req.bodyToMono(User.class);
-        Mono<User> test = userService.test(userMono);
-        return ServerResponse.ok().body(test, User.class);
+        ActivePet testPet = new ActivePet();
+        testPet.setName("Test Active Pet");
+        testPet.setOwner("Dakota");
+        testPet.setHappiness(10);
+        testPet.setHappiness(10);
+        testPet.setHunger(14);
+
+        Mono<ActivePet> petMono = userService.addUserPet(testPet);
+        return ServerResponse.ok().body(petMono, ActivePet.class);
     }
 
     @LoggedIn(minRole = Role.ADMIN)

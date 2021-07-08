@@ -9,12 +9,12 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class Pet {
 
     @Id
-    private String id;
-    private String name;
-    private Integer hp;
-    private Integer hunger;
-    private Integer happiness;
-    private String[] preferredFoods;
+    protected String id;
+    protected String name;
+    protected Integer hp;
+    protected Integer hunger;
+    protected Integer happiness;
+    protected String[] preferredFoods;
 
     public Pet() {
         super();
