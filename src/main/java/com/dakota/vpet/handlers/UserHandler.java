@@ -34,8 +34,8 @@ public class UserHandler {
 
         return userMono.flatMap(user -> {
             // validation
-            if (user.getUsername() == null || user.getUsername().trim() == "" || user.getPassword() == null
-                    || user.getPassword().trim() == "" || user.getEmail() == null || user.getEmail().trim() == "") {
+            if (user.getUsername() == null || user.getUsername().isEmpty() || user.getPassword() == null
+                    || user.getPassword().isEmpty() || user.getEmail() == null || user.getEmail().isEmpty()) {
 
                 return ServerResponse.badRequest().build();
             }
@@ -86,6 +86,12 @@ public class UserHandler {
             });
 
         });
+    }
+
+    @LoggedIn
+    public Mono<ServerResponse> getUserPets(ServerRequest req){
+        String userId = req.pathVariable("id");
+        return ServerResponse.ok().bodyValue(userId);
     }
 
     @LoggedIn

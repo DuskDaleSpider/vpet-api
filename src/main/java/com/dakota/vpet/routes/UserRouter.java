@@ -16,12 +16,17 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 import org.springframework.web.server.WebFilter;
 
 @Configuration
-public class UserRoutes {
+public class UserRouter {
 
 	@Bean
-	public RouterFunction<ServerResponse> routes(UserHandler handler) {
+	public RouterFunction<ServerResponse> userRoutes(UserHandler handler) {
 		return RouterFunctions.route().path("/users", builder -> {
 			builder.POST(RequestPredicates.accept(MediaType.APPLICATION_JSON), handler::createUser);
+			builder.path("/{id}", userIdBuilder -> {
+				userIdBuilder.path("/pets", userPetsBuilder -> {
+					userPetsBuilder.GET(handler::getUserPets);
+				});
+			});
 		}).path("/login", builder -> {
 			builder.POST(RequestPredicates.accept(MediaType.APPLICATION_JSON), handler::loginUser);
 		}).path("/test", builder -> {
